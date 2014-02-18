@@ -1,0 +1,1 @@
+<form action="{$SCRIPT_NAME}?action=logout" method="post"><input type='submit' value='Log out' name='logout'/></form>

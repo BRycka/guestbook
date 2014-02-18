@@ -20,6 +20,3 @@ class Guestbook_Smarty extends Smarty {
         $this->setCacheDir(GUESTBOOK_DIR . 'cache');
     }
 }
-
-?>
-

@@ -39,12 +39,19 @@ switch($_action) {
     default:
         // viewing the guestbook
         $guestbook->displayBook($guestbook->getEntries());
-        $guestbook->loginForm();
-        $guestbook->login($_POST);
+        if(!isset($_SESSION['id']) || $_SESSION['id']== 0){
+            $guestbook->login($_POST);
+            $guestbook->displayLoginForm();
+        }else{
+            $guestbook->logout();
+            $guestbook->displayLogoutForm();
+        }
         break;
     case 'reg':
-        $guestbook->regForm();
-        $guestbook->registration($_POST);
+        if(!isset($_SESSION['id'])){
+            $guestbook->displayRegForm();
+            $guestbook->registration($_POST);
+        }
         break;
 }
 

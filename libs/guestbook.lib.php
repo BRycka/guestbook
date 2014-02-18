@@ -1,5 +1,5 @@
 <?php
-
+session_start();
 /**
  * Project: Guestbook Sample Smarty Application
  * Author: Monte Ohrt <monte [AT] ohrt [DOT] com>
@@ -77,7 +77,7 @@ class Guestbook {
      *
      * @param array $formvars the form variables
      */
-    function regForm($formvars = array()){
+    function displayRegForm($formvars = array()){
         if(!isset($formvars['Name'])){
             $formvars['Name']= '';
         }
@@ -121,7 +121,7 @@ class Guestbook {
      *
      * @param array $formvars the form variables
      */
-    function loginForm($formvars = array()){
+    function displayLoginForm($formvars = array()){
         if(!isset($formvars['Name'])){
             $formvars['Name']= '';
         }if(!isset($formvars['Password'])){
@@ -135,27 +135,43 @@ class Guestbook {
     }
 
     /**
+     * display logout button
+     *
+     * @param array $formvars the form variables
+     */
+    function displayLogoutForm(){
+        $this->tpl->display('logout.tpl');
+    }
+    function logout(){
+        if(isset($_POST['logout'])){
+            $_SESSION['id']=0;
+            header('Location: http://localhost/');
+        }
+    }
+    /**
      * login action
      *
      * @param array $formvars the form variables
      */
     function login($formvars) {
+
         if(isset($formvars['Name']) && isset($formvars['Password'])){
             try {
                 $result = $this->pdo->prepare("select * from user where Name = ? AND Password = ? LIMIT 1");
                 $result->execute(array($formvars['Name'], $formvars['Password']));
                 if($result->rowCount()==1){
-                    echo "Duomenys sutampa";
+                    $_SESSION['id']=$result->fetchColumn(0);
+//                    echo "Duomenys sutampa".'<br>'.'vartotojo id:'.$_SESSION['id'];
+                    header('Location: http://localhost/');
                 } else {
-                    print "Duomenys nesutampa";
+                    echo "Duomenys nesutampa";
                 }
             } catch (PDOException $e) {
-                print "Error!: " . $e->getMessage();
-                return false;
+                echo "Error!: " . $e->getMessage();
             }
         }
-        return true;
     }
+
 
     /**
      * fix up form data if necessary
@@ -233,9 +249,8 @@ class Guestbook {
      * @param array $data the guestbook data
      */
     function displayBook($data = array()) {
+        $this->tpl->assign('logedIn', $_SESSION['id']);
         $this->tpl->assign('data', $data);
         $this->tpl->display('guestbook.tpl');
     }
 }
-
-?>

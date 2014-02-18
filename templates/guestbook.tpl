@@ -21,5 +21,6 @@
         </tr>
     {/foreach}
 </table>
-
+{if not $logedIn}
 <a href="{$SCRIPT_NAME}?action=reg">reg</a>
+{/if}
