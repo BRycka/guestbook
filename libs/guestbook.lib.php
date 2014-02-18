@@ -73,6 +73,91 @@ class Guestbook {
     }
 
     /**
+     * display the registration form
+     *
+     * @param array $formvars the form variables
+     */
+    function regForm($formvars = array()){
+        if(!isset($formvars['Name'])){
+            $formvars['Name']= '';
+        }
+        if(!isset($formvars['LastName'])){
+            $formvars['LastName']= '';
+        }
+        if(!isset($formvars['Email'])){
+            $formvars['Email']= '';
+        }
+        if(!isset($formvars['Password'])){
+            $formvars['Password']= '';
+        }
+        // assign the form vars
+        $this->tpl->assign('post',$formvars);
+        // assign error message
+        $this->tpl->assign('error', $this->error);
+        $this->tpl->display('reg_form.tpl');
+    }
+
+    /**
+     * add a new user
+     *
+     * @param array $formvars the form variables
+     */
+    function registration($formvars) {
+        if(isset($formvars['Name']) && isset($formvars['LastName']) && isset($formvars['Email']) && isset($formvars['Password'])){
+            try {
+                $rh = $this->pdo->prepare("insert into user values(0,?,?,?,?)");
+                $rh->execute(array($formvars['Name'],$formvars['LastName'],$formvars['Email'],$formvars['Password']));
+                print "Registered";
+            } catch (PDOException $e) {
+                print "Error!: " . $e->getMessage();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * display the registration form
+     *
+     * @param array $formvars the form variables
+     */
+    function loginForm($formvars = array()){
+        if(!isset($formvars['Name'])){
+            $formvars['Name']= '';
+        }if(!isset($formvars['Password'])){
+            $formvars['Password']= '';
+        }
+        // assign the form vars
+        $this->tpl->assign('post',$formvars);
+        // assign error message
+        $this->tpl->assign('error', $this->error);
+        $this->tpl->display('login_form.tpl');
+    }
+
+    /**
+     * login action
+     *
+     * @param array $formvars the form variables
+     */
+    function login($formvars) {
+        if(isset($formvars['Name']) && isset($formvars['Password'])){
+            try {
+                $result = $this->pdo->prepare("select * from user where Name = ? AND Password = ? LIMIT 1");
+                $result->execute(array($formvars['Name'], $formvars['Password']));
+                if($result->rowCount()==1){
+                    echo "Duomenys sutampa";
+                } else {
+                    print "Duomenys nesutampa";
+                }
+            } catch (PDOException $e) {
+                print "Error!: " . $e->getMessage();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * fix up form data if necessary
      *
      * @param array $formvars the form variables
@@ -148,10 +233,8 @@ class Guestbook {
      * @param array $data the guestbook data
      */
     function displayBook($data = array()) {
-
         $this->tpl->assign('data', $data);
         $this->tpl->display('guestbook.tpl');
-
     }
 }
 

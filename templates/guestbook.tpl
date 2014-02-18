@@ -21,3 +21,5 @@
         </tr>
     {/foreach}
 </table>
+
+<a href="{$SCRIPT_NAME}?action=reg">reg</a>

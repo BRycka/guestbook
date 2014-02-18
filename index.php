@@ -39,6 +39,12 @@ switch($_action) {
     default:
         // viewing the guestbook
         $guestbook->displayBook($guestbook->getEntries());
+        $guestbook->loginForm();
+        $guestbook->login($_POST);
+        break;
+    case 'reg':
+        $guestbook->regForm();
+        $guestbook->registration($_POST);
         break;
 }
 
