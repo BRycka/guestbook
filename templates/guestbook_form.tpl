@@ -1,5 +1,4 @@
 {* Smarty *}
-
 <form action="{$SCRIPT_NAME}?action=submit" method="post">
     <table border="1">
         {if $error ne ""}

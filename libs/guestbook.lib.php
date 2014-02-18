@@ -58,7 +58,12 @@ class Guestbook {
      * @param array $formvars the form variables
      */
     function displayForm($formvars = array()) {
-
+        if(!isset($formvars['Name'])){
+            $formvars['Name']= '';
+        }
+        if(!isset($formvars['Comment'])){
+            $formvars['Comment']= '';
+        }
         // assign the form vars
         $this->tpl->assign('post',$formvars);
         // assign error message
