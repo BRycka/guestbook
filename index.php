@@ -13,9 +13,11 @@ define('GUESTBOOK_DIR', '/home/ricblt/workspace/guestbook/');
 define('SMARTY_DIR', '/home/ricblt/workspace/guestbook/Smarty-3.1.16/libs/');
 // include the setup script
 include(GUESTBOOK_DIR . 'libs/guestbook_setup.php');
+include(GUESTBOOK_DIR . 'libs/GuestbookData.php');
 
+$data = new GuestbookData();
 // create guestbook object
-$guestbook = new Guestbook;
+$guestbook = new Guestbook($data);
 
 // set the current action
 $_action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';

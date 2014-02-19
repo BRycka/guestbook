@@ -13,45 +13,24 @@ session_start();
  */
 class Guestbook
 {
-
-    // database object
-    var $pdo = null;
+    /**
+     * @var GuestbookData
+     */
+    var $data = null;
     // smarty template object
     var $tpl = null;
     // error messages
     var $error = null;
 
-    /* set database settings here! */
-    // PDO database type
-    var $dbtype = 'mysql';
-    // PDO database name
-    var $dbname = 'GUESTBOOK';
-    // PDO database host
-    var $dbhost = 'localhost';
-    // PDO database username
-    var $dbuser = 'root';
-    // PDO database password
-    var $dbpass = '';
-
 
     /**
      * class constructor
      */
-    function __construct()
+    function __construct($data)
     {
-
-        // instantiate the pdo object
-        try {
-            $dsn = "{$this->dbtype}:host={$this->dbhost};dbname={$this->dbname}";
-            $this->pdo = new PDO($dsn, $this->dbuser, $this->dbpass);
-        } catch (PDOException $e) {
-            print "Error!: " . $e->getMessage();
-            die();
-        }
-
         // instantiate the template object
+        $this->data = $data;
         $this->tpl = new Guestbook_Smarty;
-
     }
 
     /**
@@ -110,10 +89,8 @@ class Guestbook
     {
         if (isset($formvars['Name']) && isset($formvars['LastName']) && isset($formvars['Email']) && isset($formvars['Password'])) {
             try {
-                $rh = $this->pdo->prepare("insert into user values(0,?,?,?,?)");
-                $rh->execute(array($formvars['Name'], $formvars['LastName'], $formvars['Email'], $formvars['Password']));
+                $this->data->addNewUser($formvars);
                 header('Location: http://localhost/');
-                echo "Registered";
             } catch (PDOException $e) {
                 echo "Error!: " . $e->getMessage();
             }
@@ -168,17 +145,11 @@ class Guestbook
      */
     function login($formvars)
     {
-
         if (isset($formvars['Name']) && isset($formvars['Password'])) {
-            try {
-                $result = $this->pdo->prepare("select * from user where Name = ? AND Password = ? LIMIT 1");
-                $result->execute(array($formvars['Name'], $formvars['Password']));
-                if ($result->rowCount() == 1) {
-                    $_SESSION['id'] = $result->fetchColumn(0);
-                    header('Location: http://localhost/');
-                }
-            } catch (PDOException $e) {
-                echo "Error!: " . $e->getMessage();
+            $result = $this->data->findUser($formvars['Name'], $formvars['Password']);
+            if ($result != null) {
+                $_SESSION['id'] = $result['id'];
+                header('Location: http://localhost/');
             }
         }
     }
@@ -247,9 +218,7 @@ class Guestbook
             $this->error = 'password_empty';
             return false;
         }
-        $result = $this->pdo->prepare("select * from user where Email = ? LIMIT 1");
-        $result->execute(array($formvars['Email']));
-        if ($result->rowCount() == 1) {
+        if ($this->data->isUserEmailExists($formvars['Email'])) {
             $this->error = 'email_exist';
             return false;
         }
@@ -276,9 +245,8 @@ class Guestbook
             $this->error = 'password_empty';
             return false;
         }
-        $result = $this->pdo->prepare("select * from user where Name = ? AND Password = ? LIMIT 1");
-        $result->execute(array($formvars['Name'], $formvars['Password']));
-        if ($result->rowCount() == 0) {
+        $result = $this->data->isUserExists($formvars['Name'], $formvars['Password']);
+        if (!$result) {
             $this->error = 'incorrect_fields';
             return false;
         }
@@ -311,36 +279,25 @@ class Guestbook
      */
     function addEntry($formvars)
     {
-        try {
-            $rh = $this->pdo->prepare("insert into GUESTBOOK values(0,?,NOW(),?)");
-            $result = $this->pdo->prepare("select * from user where id = ? LIMIT 1");
-            $result->execute(array($_SESSION['id']));
-            if ($result->rowCount() == 1) {
-                $Name['Name'] = $result->fetchColumn(1);
-                $rh->execute(array($Name['Name'], $formvars['Comment']));
-                header('Location: http://localhost/');
-            }
-        } catch (PDOException $e) {
-            print "Error!: " . $e->getMessage();
-            return false;
+        $Name = $this->data->findUserNameById($_SESSION['id']);
+        $entry = array(
+            'Name' => $Name,
+            'Comment' => $formvars['Comment']
+        );
+        if ($this->data->addNewEntry($entry)) {
+            header('Location: http://localhost/');
+        } else {
+            echo "failed";
         }
-        return true;
     }
+
 
     /**
      * get the guestbook entries
      */
     function getEntries()
     {
-        try {
-            foreach ($this->pdo->query(
-                         "select * from GUESTBOOK order by EntryDate DESC") as $row)
-                $rows[] = $row;
-        } catch (PDOException $e) {
-            print "Error!: " . $e->getMessage();
-            return false;
-        }
-        return $rows;
+        return $this->data->findAllEntries();
     }
 
     /**
@@ -351,12 +308,6 @@ class Guestbook
     function displayBook($data = array())
     {
         $this->tpl->assign('logedIn', $_SESSION['id']);
-        $result = $this->pdo->prepare("select * from user where id = ? LIMIT 1");
-        $result->execute(array($_SESSION['id']));
-        if ($result->rowCount() == 1) {
-            $Name['Name'] = $result->fetchColumn(1);
-            $this->tpl->assign('Name', $Name['Name']);
-        }
         $this->tpl->assign('data', $data);
         $this->tpl->display('guestbook.tpl');
     }
