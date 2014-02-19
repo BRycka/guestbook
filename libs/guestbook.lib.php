@@ -11,7 +11,8 @@ session_start();
  * guestbook application library
  *
  */
-class Guestbook {
+class Guestbook
+{
 
     // database object
     var $pdo = null;
@@ -36,12 +37,13 @@ class Guestbook {
     /**
      * class constructor
      */
-    function __construct() {
+    function __construct()
+    {
 
         // instantiate the pdo object
         try {
             $dsn = "{$this->dbtype}:host={$this->dbhost};dbname={$this->dbname}";
-            $this->pdo =  new PDO($dsn,$this->dbuser,$this->dbpass);
+            $this->pdo = new PDO($dsn, $this->dbuser, $this->dbpass);
         } catch (PDOException $e) {
             print "Error!: " . $e->getMessage();
             die();
@@ -57,15 +59,16 @@ class Guestbook {
      *
      * @param array $formvars the form variables
      */
-    function displayForm($formvars = array()) {
-        if(!isset($formvars['Name'])){
-            $formvars['Name']= '';
+    function displayForm($formvars = array())
+    {
+        if (!isset($formvars['Name'])) {
+            $formvars['Name'] = '';
         }
-        if(!isset($formvars['Comment'])){
-            $formvars['Comment']= '';
+        if (!isset($formvars['Comment'])) {
+            $formvars['Comment'] = '';
         }
         // assign the form vars
-        $this->tpl->assign('post',$formvars);
+        $this->tpl->assign('post', $formvars);
         // assign error message
         $this->tpl->assign('error', $this->error);
         $this->tpl->display('guestbook_form.tpl');
@@ -77,21 +80,22 @@ class Guestbook {
      *
      * @param array $formvars the form variables
      */
-    function displayRegForm($formvars = array()){
-        if(!isset($formvars['Name'])){
-            $formvars['Name']= '';
+    function displayRegForm($formvars = array())
+    {
+        if (!isset($formvars['Name'])) {
+            $formvars['Name'] = '';
         }
-        if(!isset($formvars['LastName'])){
-            $formvars['LastName']= '';
+        if (!isset($formvars['LastName'])) {
+            $formvars['LastName'] = '';
         }
-        if(!isset($formvars['Email'])){
-            $formvars['Email']= '';
+        if (!isset($formvars['Email'])) {
+            $formvars['Email'] = '';
         }
-        if(!isset($formvars['Password'])){
-            $formvars['Password']= '';
+        if (!isset($formvars['Password'])) {
+            $formvars['Password'] = '';
         }
         // assign the form vars
-        $this->tpl->assign('post',$formvars);
+        $this->tpl->assign('post', $formvars);
         // assign error message
         $this->tpl->assign('error', $this->error);
         $this->tpl->display('reg_form.tpl');
@@ -102,11 +106,12 @@ class Guestbook {
      *
      * @param array $formvars the form variables
      */
-    function registration($formvars) {
-        if(isset($formvars['Name']) && isset($formvars['LastName']) && isset($formvars['Email']) && isset($formvars['Password'])){
+    function registration($formvars)
+    {
+        if (isset($formvars['Name']) && isset($formvars['LastName']) && isset($formvars['Email']) && isset($formvars['Password'])) {
             try {
                 $rh = $this->pdo->prepare("insert into user values(0,?,?,?,?)");
-                $rh->execute(array($formvars['Name'],$formvars['LastName'],$formvars['Email'],$formvars['Password']));
+                $rh->execute(array($formvars['Name'], $formvars['LastName'], $formvars['Email'], $formvars['Password']));
                 header('Location: http://localhost/');
                 echo "Registered";
             } catch (PDOException $e) {
@@ -120,15 +125,16 @@ class Guestbook {
      *
      * @param array $formvars the form variables
      */
-    function displayLoginForm($formvars = array()){
-        if(!isset($formvars['Name'])){
-            $formvars['Name']= '';
+    function displayLoginForm($formvars = array())
+    {
+        if (!isset($formvars['Name'])) {
+            $formvars['Name'] = '';
         }
-        if(!isset($formvars['Password'])){
-            $formvars['Password']= '';
+        if (!isset($formvars['Password'])) {
+            $formvars['Password'] = '';
         }
         // assign the form vars
-        $this->tpl->assign('post',$formvars);
+        $this->tpl->assign('post', $formvars);
         // assign error message
         $this->tpl->assign('error', $this->error);
         $this->tpl->display('login_form.tpl');
@@ -139,51 +145,53 @@ class Guestbook {
      *
      * @param array $formvars the form variables
      */
-    function displayLogoutForm(){
+    function displayLogoutForm()
+    {
         $this->tpl->display('logout.tpl');
     }
-    function logout(){
-        if(isset($_POST['logout'])){
-            $_SESSION['id']=0;
+
+    /**
+     * logout action
+     */
+    function logout()
+    {
+        if (isset($_POST['logout'])) {
+            $_SESSION['id'] = 0;
             header('Location: http://localhost/');
         }
     }
+
     /**
      * login action
      *
      * @param array $formvars the form variables
      */
-    function login($formvars) {
+    function login($formvars)
+    {
 
-        if(isset($formvars['Name']) && isset($formvars['Password'])){
+        if (isset($formvars['Name']) && isset($formvars['Password'])) {
             try {
                 $result = $this->pdo->prepare("select * from user where Name = ? AND Password = ? LIMIT 1");
                 $result->execute(array($formvars['Name'], $formvars['Password']));
-                if($result->rowCount()==1){
-                    $_SESSION['id']=$result->fetchColumn(0);
-//                    echo "Duomenys sutampa".'<br>'.'vartotojo id:'.$_SESSION['id'];
+                if ($result->rowCount() == 1) {
+                    $_SESSION['id'] = $result->fetchColumn(0);
                     header('Location: http://localhost/');
-                }// else {
-//                    echo "Duomenys nesutampa";
-//                }
+                }
             } catch (PDOException $e) {
                 echo "Error!: " . $e->getMessage();
             }
         }
     }
 
-
     /**
      * fix up form data if necessary
      *
      * @param array $formvars the form variables
      */
-    function mungeFormData(&$formvars) {
-
+    function mungeFormData(&$formvars)
+    {
         // trim off excess whitespace
-        $formvars['Name'] = trim($formvars['Name']);
         $formvars['Comment'] = trim($formvars['Comment']);
-
     }
 
     /**
@@ -191,12 +199,23 @@ class Guestbook {
      *
      * @param array $formvars the form variables
      */
-    function mungeLoginFormData(&$formvars) {
-
+    function mungeLoginFormData(&$formvars)
+    {
         // trim off excess whitespace
         $formvars['Name'] = trim($formvars['Name']);
-        $formvars['Password'] = trim($formvars['Password']);
+    }
 
+    /**
+     * fix up form data if necessary
+     *
+     * @param array $formvars the form variables
+     */
+    function mungeRegFormData(&$formvars)
+    {
+        // trim off excess whitespace
+        $formvars['Name'] = trim($formvars['Name']);
+        $formvars['LastName'] = trim($formvars['LastName']);
+        $formvars['Email'] = trim($formvars['Email']);
     }
 
     /**
@@ -204,23 +223,36 @@ class Guestbook {
      *
      * @param array $formvars the form variables
      */
-    function isValidLoginForm($formvars) {
-
+    function isValidRegForm($formvars)
+    {
         // reset error message
         $this->error = null;
-            // test if "Name" is empty
-            if(strlen($formvars['Name']) == 0) {
-               $this->error = 'name_empty';
-               // echo "empty name!";
-                return false;
-            }
-            // test if "Comment" is empty
-            if(strlen($formvars['Password']) == 0) {
-                $this->error = 'password_empty';
-                //echo "empty name!";
-                return false;
-            }
-
+        // test if "Name" is empty
+        if (strlen($formvars['Name']) == 0) {
+            $this->error = 'name_empty';
+            return false;
+        }
+        // test if "LastName" is empty
+        if (strlen($formvars['LastName']) == 0) {
+            $this->error = 'last_name_empty';
+            return false;
+        }
+        // test if "Email" is empty
+        if (strlen($formvars['Email']) == 0) {
+            $this->error = 'email_empty';
+            return false;
+        }
+        // test if "Password" is empty
+        if (strlen($formvars['Password']) == 0) {
+            $this->error = 'password_empty';
+            return false;
+        }
+        $result = $this->pdo->prepare("select * from user where Email = ? LIMIT 1");
+        $result->execute(array($formvars['Email']));
+        if ($result->rowCount() == 1) {
+            $this->error = 'email_exist';
+            return false;
+        }
         // form passed validation
         return true;
     }
@@ -230,23 +262,44 @@ class Guestbook {
      *
      * @param array $formvars the form variables
      */
-    function isValidForm($formvars) {
-
+    function isValidLoginForm($formvars)
+    {
         // reset error message
         $this->error = null;
-
         // test if "Name" is empty
-        if(strlen($formvars['Name']) == 0) {
+        if (strlen($formvars['Name']) == 0) {
             $this->error = 'name_empty';
             return false;
         }
-
         // test if "Comment" is empty
-        if(strlen($formvars['Comment']) == 0) {
+        if (strlen($formvars['Password']) == 0) {
+            $this->error = 'password_empty';
+            return false;
+        }
+        $result = $this->pdo->prepare("select * from user where Name = ? AND Password = ? LIMIT 1");
+        $result->execute(array($formvars['Name'], $formvars['Password']));
+        if ($result->rowCount() == 0) {
+            $this->error = 'incorrect_fields';
+            return false;
+        }
+        // form passed validation
+        return true;
+    }
+
+    /**
+     * test if form information is valid
+     *
+     * @param array $formvars the form variables
+     */
+    function isValidForm($formvars)
+    {
+        // reset error message
+        $this->error = null;
+        // test if "Comment" is empty
+        if (strlen($formvars['Comment']) == 0) {
             $this->error = 'comment_empty';
             return false;
         }
-
         // form passed validation
         return true;
     }
@@ -256,10 +309,17 @@ class Guestbook {
      *
      * @param array $formvars the form variables
      */
-    function addEntry($formvars) {
+    function addEntry($formvars)
+    {
         try {
             $rh = $this->pdo->prepare("insert into GUESTBOOK values(0,?,NOW(),?)");
-            $rh->execute(array($formvars['Name'],$formvars['Comment']));
+            $result = $this->pdo->prepare("select * from user where id = ? LIMIT 1");
+            $result->execute(array($_SESSION['id']));
+            if ($result->rowCount() == 1) {
+                $Name['Name'] = $result->fetchColumn(1);
+                $rh->execute(array($Name['Name'], $formvars['Comment']));
+                header('Location: http://localhost/');
+            }
         } catch (PDOException $e) {
             print "Error!: " . $e->getMessage();
             return false;
@@ -270,10 +330,11 @@ class Guestbook {
     /**
      * get the guestbook entries
      */
-    function getEntries() {
+    function getEntries()
+    {
         try {
-            foreach($this->pdo->query(
-                        "select * from GUESTBOOK order by EntryDate DESC") as $row)
+            foreach ($this->pdo->query(
+                         "select * from GUESTBOOK order by EntryDate DESC") as $row)
                 $rows[] = $row;
         } catch (PDOException $e) {
             print "Error!: " . $e->getMessage();
@@ -287,8 +348,15 @@ class Guestbook {
      *
      * @param array $data the guestbook data
      */
-    function displayBook($data = array()) {
+    function displayBook($data = array())
+    {
         $this->tpl->assign('logedIn', $_SESSION['id']);
+        $result = $this->pdo->prepare("select * from user where id = ? LIMIT 1");
+        $result->execute(array($_SESSION['id']));
+        if ($result->rowCount() == 1) {
+            $Name['Name'] = $result->fetchColumn(1);
+            $this->tpl->assign('Name', $Name['Name']);
+        }
         $this->tpl->assign('data', $data);
         $this->tpl->display('guestbook.tpl');
     }

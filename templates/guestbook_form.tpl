@@ -10,13 +10,13 @@
                 </td>
             </tr>
         {/if}
-        <tr>
-            <td>Name:</td>
-            <td>
-                <input type="text" name="Name"
-                       value="{$post.Name|escape}" size="40">
-            </td>
-        </tr>
+        {*<tr>*}
+            {*<td>Name:</td>*}
+            {*<td>*}
+                {*<input type="text" name="Name"*}
+                       {*value="{$post.Name|escape}" size="40">*}
+            {*</td>*}
+        {*</tr>*}
         <tr>
             <td valign="top">Comment:</td>
             <td>

@@ -56,9 +56,17 @@ switch($_action) {
         }
         break;
     case 'reg':
-        if(!isset($_SESSION['id']) || $_SESSION['id']== 0){
-            $guestbook->registration($_POST);
+        //if(!isset($_SESSION['id']) || $_SESSION['id']== 0){
             $guestbook->displayRegForm();
-        }
+       // }
+        break;
+    case 'regSubmit':
+            $guestbook->mungeRegFormData($_POST);
+            if($guestbook->isValidRegForm($_POST)) {
+                $guestbook->registration($_POST);
+                $guestbook->displayRegForm($_POST);
+            }else{
+                $guestbook->displayRegForm($_POST);
+            }
         break;
 }
