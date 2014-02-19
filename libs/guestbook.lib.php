@@ -107,13 +107,12 @@ class Guestbook {
             try {
                 $rh = $this->pdo->prepare("insert into user values(0,?,?,?,?)");
                 $rh->execute(array($formvars['Name'],$formvars['LastName'],$formvars['Email'],$formvars['Password']));
-                print "Registered";
+                header('Location: http://localhost/');
+                echo "Registered";
             } catch (PDOException $e) {
-                print "Error!: " . $e->getMessage();
-                return false;
+                echo "Error!: " . $e->getMessage();
             }
         }
-        return true;
     }
 
     /**
@@ -124,7 +123,8 @@ class Guestbook {
     function displayLoginForm($formvars = array()){
         if(!isset($formvars['Name'])){
             $formvars['Name']= '';
-        }if(!isset($formvars['Password'])){
+        }
+        if(!isset($formvars['Password'])){
             $formvars['Password']= '';
         }
         // assign the form vars
@@ -163,9 +163,9 @@ class Guestbook {
                     $_SESSION['id']=$result->fetchColumn(0);
 //                    echo "Duomenys sutampa".'<br>'.'vartotojo id:'.$_SESSION['id'];
                     header('Location: http://localhost/');
-                } else {
-                    echo "Duomenys nesutampa";
-                }
+                }// else {
+//                    echo "Duomenys nesutampa";
+//                }
             } catch (PDOException $e) {
                 echo "Error!: " . $e->getMessage();
             }
@@ -184,6 +184,45 @@ class Guestbook {
         $formvars['Name'] = trim($formvars['Name']);
         $formvars['Comment'] = trim($formvars['Comment']);
 
+    }
+
+    /**
+     * fix up form data if necessary
+     *
+     * @param array $formvars the form variables
+     */
+    function mungeLoginFormData(&$formvars) {
+
+        // trim off excess whitespace
+        $formvars['Name'] = trim($formvars['Name']);
+        $formvars['Password'] = trim($formvars['Password']);
+
+    }
+
+    /**
+     * test if form information is valid
+     *
+     * @param array $formvars the form variables
+     */
+    function isValidLoginForm($formvars) {
+
+        // reset error message
+        $this->error = null;
+            // test if "Name" is empty
+            if(strlen($formvars['Name']) == 0) {
+               $this->error = 'name_empty';
+               // echo "empty name!";
+                return false;
+            }
+            // test if "Comment" is empty
+            if(strlen($formvars['Password']) == 0) {
+                $this->error = 'password_empty';
+                //echo "empty name!";
+                return false;
+            }
+
+        // form passed validation
+        return true;
     }
 
     /**

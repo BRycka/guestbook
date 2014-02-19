@@ -1,4 +1,7 @@
 {* Smarty *}
+{if not $logedIn}
+    <a href="{$SCRIPT_NAME}?action=reg">register</a>
+{/if}
 
 <table border="0" width="300">
     <tr>
@@ -21,6 +24,3 @@
         </tr>
     {/foreach}
 </table>
-{if not $logedIn}
-<a href="{$SCRIPT_NAME}?action=reg">reg</a>
-{/if}

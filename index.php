@@ -37,22 +37,28 @@ switch($_action) {
         break;
     case 'view':
     default:
-        // viewing the guestbook
-        $guestbook->displayBook($guestbook->getEntries());
         if(!isset($_SESSION['id']) || $_SESSION['id']== 0){
-            $guestbook->login($_POST);
-            $guestbook->displayLoginForm();
+             $guestbook->displayLoginForm();
         }else{
             $guestbook->logout();
             $guestbook->displayLogoutForm();
         }
+        // viewing the guestbook
+        $guestbook->displayBook($guestbook->getEntries());
+        break;
+    case 'loginSubmit':
+        $guestbook->mungeLoginFormData($_POST);
+        if($guestbook->isValidLoginForm($_POST)) {
+            $guestbook->login($_POST);
+            $guestbook->displayLoginForm($_POST);
+        }else{
+            $guestbook->displayLoginForm($_POST);
+        }
         break;
     case 'reg':
-        if(!isset($_SESSION['id'])){
-            $guestbook->displayRegForm();
+        if(!isset($_SESSION['id']) || $_SESSION['id']== 0){
             $guestbook->registration($_POST);
+            $guestbook->displayRegForm();
         }
         break;
 }
-
-?>
